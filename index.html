@@ -2,22 +2,30 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Rain on my Parade</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     <link rel="stylesheet" href="css/leaflet-routing-machine.css" />
     <link rel="stylesheet" href="css/main.css">
   </head>
-  <body>
 
-    <form class="locations">
-      <label for="start-input">Origin Address</label>
-      <input type="text" class="start-input" name="start-input" id="start-input" placeholder="206 S Garfield Ave, Monterey Park, CA 91754">
-      <label for="end-input">Destination Address</label>
-      <input type="text" class="end-input" name="end-input" id="end-input" placeholder="3226 SE Division St, Portland, OR 97202"> <br>
-      <button type="button" name="button" class="button">GO!</button>
-    </form>
+  <body>
+    <div class="input-page">
+      <h1 class="title">Check Your Trip</h1>
+      <section class="input-section">
+        <form class="locations">
+          <label for="start-input">Origin Address</label><br>
+          <input type="text" class="start-input" name="start-input" id="start-input" placeholder="206 S Garfield Ave, Monterey Park, CA 91754"><br>
+          <label for="end-input">Destination Address</label><br>
+          <input type="text" class="end-input" name="end-input" id="end-input" placeholder="3226 SE Division St, Portland, OR 97202"> <br>
+          <button type="button" name="button" class="button">GO!</button>
+        </form>
+      </section>
+    </div>
+
     <div id="mapid"></div>
 
     <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
@@ -25,9 +33,7 @@
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
     <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <script src="js/leaflet-routing-machine.js"></script>
-    <script src="js/Control.Geocoder.js">
-
-    </script>
+    <script src="js/Control.Geocoder.js"></script>
     <script src="js/app.js"></script>
   </body>
 </html>
