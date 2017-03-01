@@ -63,7 +63,7 @@ TripCheck.intervalWeather = function(i) {
     .then(function(response){
       var txtForecastString = response.data.forecast.txt_forecast.forecastday;
       var simpleForecastString = response.data.forecast.simpleforecast.forecastday;
-      var localIcon = new intervalWeatherIcon({iconUrl: "http://icons.wxug.com/i/c/k/" + simpleForecastString[0].icon + ".gif"});
+      var localIcon = new intervalWeatherIcon({iconUrl: "https://icons.wxug.com/i/c/k/" + simpleForecastString[0].icon + ".gif"});
       L.marker([i[0], i[1]], {icon: localIcon}).addTo(TripCheck.map)
         .on('click', function(e) {
           L.popup(popupOptions)
@@ -95,7 +95,7 @@ TripCheck.getWeatherData = function() {
       // console.log(response.data)
       var txtForecastString = response.data.forecast.txt_forecast.forecastday;
       var simpleForecastString = response.data.forecast.simpleforecast.forecastday;
-      var originIcon = new weatherIcon({iconUrl: "http://icons.wxug.com/i/c/k/" + simpleForecastString[0].icon + ".gif"});
+      var originIcon = new weatherIcon({iconUrl: "https://icons.wxug.com/i/c/k/" + simpleForecastString[0].icon + ".gif"});
       L.marker([TripCheck.originLat, TripCheck.originLng], {icon: originIcon}).addTo(TripCheck.map)
         .on('click', function(e) {
           L.popup({options: {offset:[0, 50]}})
@@ -113,7 +113,7 @@ TripCheck.getWeatherData = function() {
     .then(function(response){
       var txtForecastString = response.data.forecast.txt_forecast.forecastday;
       var simpleForecastString = response.data.forecast.simpleforecast.forecastday;
-      var destinationIcon = new weatherIcon({iconUrl: "http://icons.wxug.com/i/c/k/" + simpleForecastString[0].icon + ".gif"});
+      var destinationIcon = new weatherIcon({iconUrl: "https://icons.wxug.com/i/c/k/" + simpleForecastString[0].icon + ".gif"});
       L.marker([TripCheck.destinationLat, TripCheck.destinationLng], {icon: destinationIcon}).addTo(TripCheck.map)
         .on('click', function(e) {
           L.popup()
@@ -130,7 +130,8 @@ TripCheck.getWeatherData = function() {
 };
 
 // starts routing process on button click
-$(".button").click(function(event) {
+$(".locations").submit(function(event) {
+  event.preventDefault();
   $(".input-page").addClass('hidden');
   origin = document.getElementById('start-input').value.replace(/ /g, '+');
   destination = document.getElementById('end-input').value.replace(/ /g, '+');
