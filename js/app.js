@@ -2,7 +2,7 @@ var TripCheck = {};
 
 // API call URLS
 TripCheck.geocode_URL = 'https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyAtsQkI9rXQT7kf36Giu_qms_Ksowljab4&address=';
-TripCheck.weather_URL = 'http://api.wunderground.com/api/7bf2e0a9dad48df1/forecast/q/'
+TripCheck.weather_URL = 'https://api.wunderground.com/api/7bf2e0a9dad48df1/forecast/q/'
 
 // initiate map and add basic tile layer, currently launches on London.
 TripCheck.map = L.map('mapid').setView([33.2148, -97.1331], 12);
