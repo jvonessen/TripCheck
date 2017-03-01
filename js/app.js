@@ -28,8 +28,6 @@ TripCheck.fetchAndRenderRoute = function(callback) {
     addWaypoints: false,
     router: L.Routing.mapbox('pk.eyJ1IjoianZvbmVzc2VuIiwiYSI6ImNpeXVwaTQ2azAxc3Ayd21ocGw3ZnY4NHcifQ.Ae31-8rR2qFmyiYaBtwf_A'),
   }).addTo(TripCheck.map)
-    // .on('routesfound', function (e) {
-    //   TripCheck.alongTheWay(e)})
       .on('routeselected', function (e) {
         TripCheck.alongTheWay(e)});
   $(".leaflet-routing-container").addClass("leaflet-routing-container-hide");
@@ -65,7 +63,7 @@ TripCheck.intervalWeather = function(i) {
     .then(function(response){
       var txtForecastString = response.data.forecast.txt_forecast.forecastday;
       var simpleForecastString = response.data.forecast.simpleforecast.forecastday;
-      var localIcon = new intervalWeatherIcon({iconUrl: simpleForecastString[0].icon_url});
+      var localIcon = new intervalWeatherIcon({iconUrl: "http://icons.wxug.com/i/c/k/" + simpleForecastString[0].icon + ".gif"});
       L.marker([i[0], i[1]], {icon: localIcon}).addTo(TripCheck.map)
         .on('click', function(e) {
           L.popup(popupOptions)
@@ -97,7 +95,7 @@ TripCheck.getWeatherData = function() {
       // console.log(response.data)
       var txtForecastString = response.data.forecast.txt_forecast.forecastday;
       var simpleForecastString = response.data.forecast.simpleforecast.forecastday;
-      var originIcon = new weatherIcon({iconUrl: simpleForecastString[0].icon_url});
+      var originIcon = new weatherIcon({iconUrl: "http://icons.wxug.com/i/c/k/" + simpleForecastString[0].icon + ".gif"});
       L.marker([TripCheck.originLat, TripCheck.originLng], {icon: originIcon}).addTo(TripCheck.map)
         .on('click', function(e) {
           L.popup({options: {offset:[0, 50]}})
@@ -115,7 +113,7 @@ TripCheck.getWeatherData = function() {
     .then(function(response){
       var txtForecastString = response.data.forecast.txt_forecast.forecastday;
       var simpleForecastString = response.data.forecast.simpleforecast.forecastday;
-      var destinationIcon = new weatherIcon({iconUrl: simpleForecastString[0].icon_url});
+      var destinationIcon = new weatherIcon({iconUrl: "http://icons.wxug.com/i/c/k/" + simpleForecastString[0].icon + ".gif"});
       L.marker([TripCheck.destinationLat, TripCheck.destinationLng], {icon: destinationIcon}).addTo(TripCheck.map)
         .on('click', function(e) {
           L.popup()
