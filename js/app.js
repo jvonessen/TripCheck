@@ -28,8 +28,10 @@ TripCheck.fetchAndRenderRoute = function(callback) {
     addWaypoints: false,
     router: L.Routing.mapbox('pk.eyJ1IjoianZvbmVzc2VuIiwiYSI6ImNpeXVwaTQ2azAxc3Ayd21ocGw3ZnY4NHcifQ.Ae31-8rR2qFmyiYaBtwf_A'),
   }).addTo(TripCheck.map)
-    .on('routesfound', function (e) {
-      TripCheck.alongTheWay(e)});
+    // .on('routesfound', function (e) {
+    //   TripCheck.alongTheWay(e)})
+      .on('routeselected', function (e) {
+        TripCheck.alongTheWay(e)});
   $(".leaflet-routing-container").addClass("leaflet-routing-container-hide");
 };
 
@@ -37,48 +39,46 @@ TripCheck.fetchAndRenderRoute = function(callback) {
 
 //find waypoint coordinates for intermediary weather data
 TripCheck.alongTheWay = function(e) {
-  var interval = Math.round(e.routes[0].coordinates.length/4);
+  var interval = Math.round(e.route.coordinates.length/4);
   var weatherLocals = [];
-  for (i=interval;i<=e.routes[0].coordinates.length-10;i+=interval) {
-    weatherLocals.push([e.routes[0].coordinates[i].lat,e.routes[0].coordinates[i].lng]);
+  for (i=interval;i<=e.route.coordinates.length-10;i+=interval) {
+    weatherLocals.push([e.route.coordinates[i].lat,e.route.coordinates[i].lng]);
   };
-  TripCheck.intervalWeather(weatherLocals);
+  weatherLocals.forEach(TripCheck.intervalWeather);
 };
 
 // fetch and display intermediary weather data
-TripCheck.intervalWeather = function(weatherLocals) {
-  var weatherIcon = L.Icon.extend({
+TripCheck.intervalWeather = function(i) {
+  $('.interval-weather-icon').remove();
+  var intervalWeatherIcon = L.Icon.extend({
     options: {
       iconUrl: 'icon.jpg',
       iconSize:     [50, 50],
-      iconAnchor:   [25, 10], // point of the icon which will correspond to marker's location
+      iconAnchor:   [25, 30], // point of the icon which will correspond to marker's location
       shadowAnchor: [4, 62],  // the same for the shadow
-      popupAnchor:  [0, -70] // point from which the popup should open relative to the iconAnchor
+      popupAnchor:  [0, 0], // point from which the popup should open relative to the iconAnchor
+      className: 'interval-weather-icon'
     }
   });
-  for (i=0;i<weatherLocals.length;i++) {
-    axios.get(TripCheck.weather_URL + weatherLocals[i][0] + ',' + weatherLocals[i][1] + '.json')
-      .then(function(response){
-        // console.log(response.data);
-        console.log(i);
-        var txtForecastString = response.data.forecast.txt_forecast.forecastday;
-        var simpleForecastString = response.data.forecast.simpleforecast.forecastday;
-        var localIcon = new weatherIcon({iconUrl: simpleForecastString[0].icon_url});
-        L.marker([weatherLocals[i][0], weatherLocals[i][1]], {icon: localIcon}).addTo(TripCheck.map)
-          .on('click', function(e) {
-            L.popup({options: {offset: [0, 50]}})
-              .setContent("<b>" + txtForecastString[0].title +
-                ":</b></br>High " + simpleForecastString[0].high.fahrenheit + "ºF. Low " + simpleForecastString[0].low.fahrenheit +
-                "ºF. Chance of precipitation: " + txtForecastString[0].pop + "%" +
-                "<br><b>" + txtForecastString[1].title +
-                ":</b></br>Low " + simpleForecastString[0].low.fahrenheit + "ºF. " + txtForecastString[1].fcttext +
-                " Chance of precipitation: " + txtForecastString[1].pop + "%")
-              .setLatLng([weatherLocals[i][0],weatherLocals[i][1]])
-              .openOn(TripCheck.map);
-          });
-      });
-
-  };
+  var popupOptions = {className: "interval-popup"}
+  axios.get(TripCheck.weather_URL + i[0] + ',' + i[1] + '.json')
+    .then(function(response){
+      var txtForecastString = response.data.forecast.txt_forecast.forecastday;
+      var simpleForecastString = response.data.forecast.simpleforecast.forecastday;
+      var localIcon = new intervalWeatherIcon({iconUrl: simpleForecastString[0].icon_url});
+      L.marker([i[0], i[1]], {icon: localIcon}).addTo(TripCheck.map)
+        .on('click', function(e) {
+          L.popup(popupOptions)
+            .setContent("<b>" + txtForecastString[0].title +
+              ":</b></br>High " + simpleForecastString[0].high.fahrenheit + "ºF. " +
+              "Chance of precipitation: " + txtForecastString[0].pop + "%" +
+              "<br><b>" + txtForecastString[1].title +
+              ":</b></br>Low " + simpleForecastString[0].low.fahrenheit + "ºF. " +
+              "Chance of precipitation: " + txtForecastString[1].pop + "%")
+            .setLatLng([i[0],i[1]])
+            .openOn(TripCheck.map);
+        });
+    });
 }
 
 // Getting weather data
@@ -89,7 +89,7 @@ TripCheck.getWeatherData = function() {
       iconSize:     [50, 50],
       iconAnchor:   [25, 90], // point of the icon which will correspond to marker's location
       shadowAnchor: [4, 62],  // the same for the shadow
-      popupAnchor:  [0, -70] // point from which the popup should open relative to the iconAnchor
+      popupAnchor:  [0, 70] // point from which the popup should open relative to the iconAnchor
     }
   });
   axios.get(TripCheck.weather_URL + TripCheck.originLat + ',' + TripCheck.originLng + '.json')
@@ -100,13 +100,13 @@ TripCheck.getWeatherData = function() {
       var originIcon = new weatherIcon({iconUrl: simpleForecastString[0].icon_url});
       L.marker([TripCheck.originLat, TripCheck.originLng], {icon: originIcon}).addTo(TripCheck.map)
         .on('click', function(e) {
-          L.popup({options: {offset: [0, 50]}})
+          L.popup({options: {offset:[0, 50]}})
             .setContent("<b>" + txtForecastString[0].title +
-              ":</b></br>High " + simpleForecastString[0].high.fahrenheit + "ºF. Low " + simpleForecastString[0].low.fahrenheit +
-              "ºF. Chance of precipitation: " + txtForecastString[0].pop + "%" +
+              ":</b></br>High " + simpleForecastString[0].high.fahrenheit + "ºF. " +
+              "Chance of precipitation: " + txtForecastString[0].pop + "%" +
               "<br><b>" + txtForecastString[1].title +
-              ":</b></br>Low " + simpleForecastString[0].low.fahrenheit + "ºF. " + txtForecastString[1].fcttext +
-              " Chance of precipitation: " + txtForecastString[1].pop + "%")
+              ":</b></br>Low " + simpleForecastString[0].low.fahrenheit + "ºF. " +
+              "Chance of precipitation: " + txtForecastString[1].pop + "%")
             .setLatLng([TripCheck.originLat,TripCheck.originLng])
             .openOn(TripCheck.map);
         });
@@ -120,11 +120,11 @@ TripCheck.getWeatherData = function() {
         .on('click', function(e) {
           L.popup()
             .setContent("<b>" + txtForecastString[0].title +
-              ":</b></br>High " + simpleForecastString[0].high.fahrenheit + "º. " +  txtForecastString[0].fcttext +
-              " Chance of precipitation: " + txtForecastString[0].pop + "%" +
+              ":</b></br>High " + simpleForecastString[0].high.fahrenheit + "º. " +
+              "Chance of precipitation: " + txtForecastString[0].pop + "%" +
               "<br><b>" + txtForecastString[1].title +
-              ":</b></br>Low " + simpleForecastString[0].low.fahrenheit + "º. " + txtForecastString[1].fcttext +
-              " Chance of precipitation: " + txtForecastString[1].pop + "%")
+              ":</b></br>Low " + simpleForecastString[0].low.fahrenheit + "º. " +
+              "Chance of precipitation: " + txtForecastString[1].pop + "%")
             .setLatLng([TripCheck.destinationLat,TripCheck.destinationLng])
             .openOn(TripCheck.map);
         });

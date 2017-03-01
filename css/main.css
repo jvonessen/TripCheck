@@ -142,3 +142,7 @@ button:hover {
 .leaflet-popup {
   margin-bottom: 75px;
 }
+
+.interval-popup {
+  margin-bottom: 20px;
+}
