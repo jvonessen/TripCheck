@@ -146,3 +146,8 @@ button:hover {
 .interval-popup {
   margin-bottom: 20px;
 }
+
+.leaflet-routing-collapse-btn {
+  top: -1px;
+  left: 2px;
+}

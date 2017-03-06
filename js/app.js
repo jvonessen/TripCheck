@@ -129,10 +129,20 @@ TripCheck.getWeatherData = function() {
     });
 };
 
-// starts routing process on button click
+function FatalError(){ Error.apply(this, arguments); this.name = "FatalError"; }
+FatalError.prototype = Object.create(Error.prototype);
+
+// starts routing process on form submit
 $(".locations").submit(function(event) {
   event.preventDefault();
-  $(".input-page").addClass('hidden');
+  if ($("label[for='start-input']").html() != "Origin Address") {
+    $("label[for='start-input']").html("Origin Address");
+    $("#start-input").css("border", "1px solid grey");
+  };
+  if ($("label[for='end-input']").html() != "Destination Address") {
+    $("label[for='end-input']").html("Destination Address");
+    $("#end-input").css("border", "1px solid grey");
+  }
   origin = document.getElementById('start-input').value.replace(/ /g, '+');
   destination = document.getElementById('end-input').value.replace(/ /g, '+');
   axios.all([
@@ -140,15 +150,31 @@ $(".locations").submit(function(event) {
       .then(function(response) {
         TripCheck.originLat = response.data.results[0].geometry.location.lat;
         TripCheck.originLng = response.data.results[0].geometry.location.lng;
+      })
+      .catch(function (error) {
+        $("#start-input").css("border", "2px solid red");
+        $("label[for='start-input']").html("Invalid Origin Address, Try Again");
+        console.log("Origin Error caught");
+        throw new FatalError("Something went badly wrong!");
+        console.log(error);
       }),
     axios.get(TripCheck.geocode_URL + destination)
       .then(function(response) {
         TripCheck.destinationLat = response.data.results[0].geometry.location.lat;
         TripCheck.destinationLng = response.data.results[0].geometry.location.lng;
+        console.log(TripCheck.destinationLat, TripCheck.destinationLng);
       })
+      .catch(function (error) {
+        $("#end-input").css("border", "2px solid red")
+        $("label[for='end-input']").html("Invalid Destination Address, Try Again");
+        console.log("Dest Error caught");
+        throw new FatalError("Something went badly wrong!");
+        console.log(error);
+      }),
     ])
-    .then(function() {
+    .then(axios.spread(function() {
       TripCheck.fetchAndRenderRoute(TripCheck.alongTheWay);
       TripCheck.getWeatherData();
-    })
+      $(".input-page").addClass('hidden');
+    }));
 })
