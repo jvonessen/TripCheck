@@ -8,8 +8,7 @@ TripCheck.weather_URL = 'https://api.wunderground.com/api/7bf2e0a9dad48df1/forec
 TripCheck.map = L.map('mapid').setView([33.2148, -97.1331], 12);
 
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, \
-     <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    attribution: 'Imagery © <a href="http://mapbox.com">Mapbox</a>',
     maxZoom: 18,
     id: 'mapbox.streets',
     accessToken: 'pk.eyJ1IjoianZvbmVzc2VuIiwiYSI6ImNpeXVwaTQ2azAxc3Ayd21ocGw3ZnY4NHcifQ.Ae31-8rR2qFmyiYaBtwf_A'
@@ -33,9 +32,7 @@ TripCheck.fetchAndRenderRoute = function(callback) {
   $(".leaflet-routing-container").addClass("leaflet-routing-container-hide");
 };
 
-
-
-//find waypoint coordinates for intermediary weather data
+//find coordinates for intermediary weather data
 TripCheck.alongTheWay = function(e) {
   var interval = Math.round(e.route.coordinates.length/4);
   var weatherLocals = [];
@@ -52,9 +49,9 @@ TripCheck.intervalWeather = function(i) {
     options: {
       iconUrl: 'icon.jpg',
       iconSize:     [50, 50],
-      iconAnchor:   [25, 30], // point of the icon which will correspond to marker's location
-      shadowAnchor: [4, 62],  // the same for the shadow
-      popupAnchor:  [0, 0], // point from which the popup should open relative to the iconAnchor
+      iconAnchor:   [25, 30],
+      shadowAnchor: [4, 62],
+      popupAnchor:  [0, 0],
       className: 'interval-weather-icon'
     }
   });
@@ -79,20 +76,19 @@ TripCheck.intervalWeather = function(i) {
     });
 }
 
-// Getting weather data
+// Fetch and display Origin and Destination Weather
 TripCheck.getWeatherData = function() {
   var weatherIcon = L.Icon.extend({
     options: {
       iconUrl: 'icon.jpg',
       iconSize:     [50, 50],
-      iconAnchor:   [25, 90], // point of the icon which will correspond to marker's location
-      shadowAnchor: [4, 62],  // the same for the shadow
-      popupAnchor:  [0, 70] // point from which the popup should open relative to the iconAnchor
+      iconAnchor:   [25, 90],
+      shadowAnchor: [4, 62],
+      popupAnchor:  [0, 70],
     }
   });
   axios.get(TripCheck.weather_URL + TripCheck.originLat + ',' + TripCheck.originLng + '.json')
     .then(function(response){
-      // console.log(response.data)
       var txtForecastString = response.data.forecast.txt_forecast.forecastday;
       var simpleForecastString = response.data.forecast.simpleforecast.forecastday;
       var originIcon = new weatherIcon({iconUrl: "https://icons.wxug.com/i/c/k/" + simpleForecastString[0].icon + ".gif"});
@@ -129,6 +125,7 @@ TripCheck.getWeatherData = function() {
     });
 };
 
+// error definition to break out of the Promise chain 
 function FatalError(){ Error.apply(this, arguments); this.name = "FatalError"; }
 FatalError.prototype = Object.create(Error.prototype);
 
@@ -154,27 +151,27 @@ $(".locations").submit(function(event) {
       .catch(function (error) {
         $("#start-input").css("border", "2px solid red");
         $("label[for='start-input']").html("Invalid Origin Address, Try Again");
-        console.log("Origin Error caught");
         throw new FatalError("Something went badly wrong!");
-        console.log(error);
       }),
     axios.get(TripCheck.geocode_URL + destination)
       .then(function(response) {
         TripCheck.destinationLat = response.data.results[0].geometry.location.lat;
         TripCheck.destinationLng = response.data.results[0].geometry.location.lng;
-        console.log(TripCheck.destinationLat, TripCheck.destinationLng);
       })
       .catch(function (error) {
         $("#end-input").css("border", "2px solid red")
         $("label[for='end-input']").html("Invalid Destination Address, Try Again");
-        console.log("Dest Error caught");
         throw new FatalError("Something went badly wrong!");
-        console.log(error);
       }),
     ])
     .then(axios.spread(function() {
+      $(".input-page").addClass('hidden');
+      $(".new-search-button").removeClass('hidden');
       TripCheck.fetchAndRenderRoute(TripCheck.alongTheWay);
       TripCheck.getWeatherData();
-      $(".input-page").addClass('hidden');
     }));
+})
+
+$(".new-search-button").click(function(event) {
+  location.reload();
 })
